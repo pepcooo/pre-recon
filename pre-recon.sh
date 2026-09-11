@@ -16,7 +16,7 @@ function help() {
 VERBOSE=false
 HEADERS=false
 SILENT=false
-DOMAIN=false
+DOMAIN_CHECK=false
 
 while getopts "hvSHD" opt; do
     case "$opt" in
@@ -34,7 +34,7 @@ while getopts "hvSHD" opt; do
             HEADERS=true
             ;;
         D)
-            DOMAIN=true
+            DOMAIN_CHECK=true
             ;;
         \?) 
             echo "Unknown option"
@@ -44,14 +44,26 @@ done
 
 shift $((OPTIND-1))
 
-ADDRESS=$1
-echo "Scanning $ADDRESS:"
+INPUT=$1
+echo "Scanning $INPUT:"
 
-if [[ $DOMAIN == true ]]; then
-    if [[ $ADDRESS =~ $IPv4_REG ]]; then
-        echo "This is an IPv4 address."
+
+if [[ "$DOMAIN_CHECK" == true ]]; then
+    DOMAIN=""
+    IP=""
+    if [[ "$INPUT" =~ $IPv4_REG ]]; then
+        IP="$INPUT"
+        DOMAIN=$(dig -x "$INPUT" +short)
     else
-        echo "This is NOT an IPv4 address."
+        DOMAIN="$INPUT"
+        IP=$(dig "$DOMAIN" +short)
+    fi
+
+    if [[ -z "$DOMAIN" ]]; then
+        echo "Couldn't find the domain."
+    else
+        echo "Domain name: $DOMAIN"
+        echo "IP: $ADDRESS"
     fi
 fi
 
