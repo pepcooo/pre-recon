@@ -1,22 +1,12 @@
 #!/bin/bash
 
-IPv4_REG="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])"
-
-
-function help() {
-    echo "This is a help page for this pre-reconnaissance tool."
-    echo "Usage:"
-    echo "./pre-recon.sh [options] <IP address>"
-    echo "Example:"
-    echo "./pre-recon.sh -v 192.168.0.1"
-    echo "This enables verbose output for a pre-recon of the 192.168.0.1 IP address."
-    echo "For more examples consolt the examples.md"
-}
+source ./utils.sh
 
 VERBOSE=false
 HEADERS=false
 SILENT=false
 DOMAIN_CHECK=false
+
 
 while getopts "hvSHD" opt; do
     case "$opt" in
@@ -60,10 +50,10 @@ if [[ "$DOMAIN_CHECK" == true ]]; then
     fi
 
     if [[ -z "$DOMAIN" ]]; then
-        echo "Couldn't find the domain."
+        echo -e "${RED}Couldn't find the domain.${RESET}"
     else
-        echo "Domain name: $DOMAIN"
-        echo "IP: $ADDRESS"
+        echo -e "${GREEN}Domain name:${RESET} $DOMAIN"
+        echo -e "${GREEN}IP:${RESET} $IP"
     fi
 fi
 
