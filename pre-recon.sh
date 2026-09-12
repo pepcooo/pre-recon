@@ -2,29 +2,31 @@
 
 source ./utils.sh
 
-VERBOSE=false
-HEADERS=false
-SILENT=false
-DOMAIN_CHECK=false
+verbose=false
+
+headers=false
+domain_check=false
+port_scan=false
 
 
-while getopts "hvSHD" opt; do
+while getopts "hvHDN:" opt; do
     case "$opt" in
         h) 
             help
             exit 0
             ;;
         v) 
-            VERBOSE=true
-            ;;
-        S)
-            SILENT=true
+            verbose=true
             ;;
         H)
-            HEADERS=true
+            headers=true
             ;;
         D)
-            DOMAIN_CHECK=true
+            domain_check=true
+            ;;
+        N) 
+            port_scan=true
+            scan_type="$OPTARG"
             ;;
         \?) 
             echo "Unknown option"
@@ -34,28 +36,31 @@ done
 
 shift $((OPTIND-1))
 
-INPUT=$1
-echo "Scanning $INPUT:"
+input=$1
+echo "Scanning $input:"
 
 
-if [[ "$DOMAIN_CHECK" == true ]]; then
-    DOMAIN=""
-    IP=""
-    if [[ "$INPUT" =~ $IPv4_REG ]]; then
-        IP="$INPUT"
-        DOMAIN=$(dig -x "$INPUT" +short)
+if [[ "$domain_check" == true ]]; then
+    domain=""
+    IP=""  
+    if [[ "$input" =~ $IPv4_REG ]]; then
+        IP="$input"
+        domain=$(dig -x "$input" +short)
     else
-        DOMAIN="$INPUT"
-        IP=$(dig "$DOMAIN" +short)
+        domain="$input"
+        IP=$(dig "$domain" +short)
     fi
 
-    if [[ -z "$DOMAIN" ]]; then
+    if [[ -z "$domain" ]]; then
         echo -e "${RED}Couldn't find the domain.${RESET}"
+
+    elif [[ -z "$ip" ]]; then
+        echo -e "${RED}Couldn't find th IP address.${RESET}"
     else
-        echo -e "${GREEN}Domain name:${RESET} $DOMAIN"
+        echo -e "${GREEN}domain name:${RESET} $domain"
         echo -e "${GREEN}IP:${RESET} $IP"
     fi
-fi
+fi 
 
 
 NMAP_SCAN1=$(nmap -sS -A -Pn $1)
