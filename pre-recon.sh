@@ -28,13 +28,13 @@ while getopts "hvHDN:" opt; do
             port_scan=true
             scan_type="$OPTARG"
             if [[ ! "$scan_type" =~ ^(s|m|f)$ ]]; then
-                echo -e "${YELLOW}Unknown port scan type." 
-                echo -e "Viable options are: ${RESET}s, m, f."
+                printf "${YELLOW}Unknown port scan type.\n" 
+                printf "Viable options are: ${RESET}s, m, f.\n"
                 exit 1
             fi
             ;;
         \?) 
-            echo "Unknown option"
+            printf "Unknown option.\n"
             ;;
     esac
 done
@@ -45,12 +45,12 @@ input=$1
 
 
 if [[ -z "$input" ]]; then
-    echo -e "${RED}Empty input.${RESET}"
+    printf "${RED}Empty input.${RESET}"
     exit 1 
 fi
 
 
-echo "Scanning $input:"
+printf "Scanning $input:\n"
 
 
 if [[ "$domain_check" == true ]]; then
@@ -65,14 +65,14 @@ if [[ "$domain_check" == true ]]; then
     fi
 
     if [[ -z "$domain" ]]; then
-        echo -e "${RED}Couldn't find the domain.${RESET}"
+        printf "${RED}Couldn't find the domain.${RESET}\n"
 
     elif [[ -z "$ip" ]]; then
-        echo -e "${RED}Couldn't find the IP address.${RESET}"
+        printf "${RED}Couldn't find the IP address.${RESET}\n"
 
     else
-        echo -e "${GREEN}Domain name:${RESET} $domain"
-        echo -e "${GREEN}IP:${RESET} $ip"
+        printf "${GREEN}Domain name:${RESET} $domain\n"
+        printf "${GREEN}IP:${RESET} $ip\n"
     fi
 fi 
 
@@ -90,5 +90,5 @@ if [[ "$port_scan" == true ]]; then
             ;;
     esac
 
-    echo "$nmap_scan"
+    printf "$nmap_scan\n"
 fi

@@ -7,11 +7,11 @@ RESET="\e[0m"
 
 
 function help() {
-    echo "This is a help page for this pre-reconnaissance tool."
-    echo "Usage:"
-    echo "./pre-recon.sh [options] <IP address>"
-    echo "Example:"
-    echo "./pre-recon.sh -v 192.168.0.1"
-    echo "This enables verbose output for a pre-recon of the 192.168.0.1 IP address."
-    echo "For more examples consolt the examples.md"
+    printf "This is a help page for this pre-reconnaissance tool.\n"
+    printf "Usage:\n"
+    printf "./pre-recon.sh [options] <IP address>\n"
+    printf "Example:\n"
+    printf "./pre-recon.sh -v 192.168.0.1\n"
+    printf "This enables verbose output for a pre-recon of the 192.168.0.1 IP address.\n"
+    printf "For more examples consolt the examples.md\n"
 }
