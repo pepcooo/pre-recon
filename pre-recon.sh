@@ -94,11 +94,17 @@ if [[ "$port_scan" == true ]]; then
 fi
 
 if [[ "$headers" == true ]]; then
+    tool_used="None"
     headers_response="Unknown"
     if is_installed curl; then
-        echo "test"
-        headers_response=$(curl -I -s https://$input)
+        headers_response=$(curl -I -s -L https://$input)
+        tool_used="cURL"
     fi
-    
+
+    if is_installed wget && [[ -z "$headers_response" ]]; then
+        headers_response=$(wget -S -q --spider --no-check-certificate --timeout=5 "http://$input" 2>&1)
+        tool_used="Wget"
+    fi
+
     printf "$headers_response\n"
 fi
