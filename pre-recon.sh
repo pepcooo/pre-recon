@@ -27,9 +27,16 @@ while getopts "hvHDN:" opt; do
         N) 
             port_scan=true
             scan_type="$OPTARG"
-            if [[ ! "$scan_type" =~ ^(s|m|f)$ ]]; then
+            if [[ "$scan_type" == "c" ]]; then
+                custom_args="${!OPTIND}"
+                if [[ -z "$custom_args" || "$custom_args" != nmap* ]]; then
+                    printf "Error in parsing custom nmap query."
+                    exit 1
+                fi
+                OPTIND=$((OPTIND+1))
+            elif [[ ! "$scan_type" =~ ^(s|m|f|c)$ ]]; then
                 printf "${YELLOW}Unknown port scan type.\n" 
-                printf "Viable options are: ${RESET}s, m, f.\n"
+                printf "Viable options are: ${RESET}s, m, f, c (custom).\n"
                 exit 1
             fi
             ;;
@@ -87,6 +94,9 @@ if [[ "$port_scan" == true ]]; then
             ;;
         f)  
             nmap_scan=$(nmap -sS -Pn -F $input)
+            ;;
+        c)
+            nmap_scan=$($custom_args "$input")
             ;;
     esac
 
