@@ -106,5 +106,15 @@ if [[ "$headers" == true ]]; then
         tool_used="Wget"
     fi
 
+    if [[ -z "$headers_response" ]]; then
+        if exec 3<>/dev/tcp/"$input"/80 2>/dev/null; then
+            echo -e "HEAD / HTTP/1.1\r\nHost: $input\r\nConnection: close\r\n\r\n" >&3
+            headers_response=$(cat <&3)
+            exec 3<&-
+        else
+            headers_response="Port 80 is closed or host is unresponsive."
+        fi
+        tool_used="Bash built-in web utilities" 
+    fi
     printf "$headers_response\n"
 fi
