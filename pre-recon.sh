@@ -2,8 +2,6 @@
 
 source ./utils.sh
 
-verbose=false
-
 headers=false
 domain_check=false
 port_scan=false
@@ -14,9 +12,6 @@ while getopts "hvHDN:" opt; do
         h) 
             help
             exit 0
-            ;;
-        v) 
-            verbose=true
             ;;
         H)
             headers=true

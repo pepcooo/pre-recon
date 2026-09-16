@@ -13,7 +13,6 @@ function help() {
     printf "Usage:\n"
     printf "    ./pre-recon.sh [options] <IP address/domain name>\n"
     printf "Available options:\n"
-    printf "    -v - enables the verbose mode (shows what the tools are doing)\n"
     printf "    -H - enables header reading using curl, wget or bash built-in utilities. ${BOLD}It is recommended to install curl.${RESET}\n"
     printf "    -D - enables DNS lookup (or reverse DNS lookup if an IP address is given).\n"
     printf "    -N <option> - enables a port scan, checking for open ports. Available scan modes are:\n"
