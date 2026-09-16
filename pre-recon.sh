@@ -92,3 +92,13 @@ if [[ "$port_scan" == true ]]; then
 
     printf "$nmap_scan\n"
 fi
+
+if [[ "$headers" == true ]]; then
+    headers_response="Unknown"
+    if is_installed curl; then
+        echo "test"
+        headers_response=$(curl -I -s https://$input)
+    fi
+    
+    printf "$headers_response\n"
+fi

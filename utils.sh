@@ -15,3 +15,7 @@ function help() {
     printf "This enables verbose output for a pre-recon of the 192.168.0.1 IP address.\n"
     printf "For more examples consolt the examples.md\n"
 }
+
+function is_installed() {
+    command -v "$1" $> /dev/null
+}
