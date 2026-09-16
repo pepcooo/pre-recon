@@ -97,7 +97,7 @@ if [[ "$headers" == true ]]; then
     tool_used="None"
     headers_response="Unknown"
     if is_installed curl; then
-        headers_response=$(curl -I -s -L https://$input)
+        headers_response=$(curl -I -s -L -k -m 5 http://$input)
         tool_used="cURL"
     fi
 
