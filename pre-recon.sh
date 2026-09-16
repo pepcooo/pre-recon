@@ -37,11 +37,13 @@ while getopts "hvHDN:" opt; do
             elif [[ ! "$scan_type" =~ ^(s|m|f|c)$ ]]; then
                 printf "${YELLOW}Unknown port scan type.\n" 
                 printf "Viable options are: ${RESET}s, m, f, c (custom).\n"
+                printf "If you need further help, please check ./pre-recon.sh -h"
                 exit 1
             fi
             ;;
         \?) 
             printf "Unknown option.\n"
+            printf "Check ./pre-recon.sh -h if you need any help."
             ;;
     esac
 done
