@@ -5,9 +5,9 @@ source ./utils.sh
 headers=false
 domain_check=false
 port_scan=false
+whois_check=false
 
-
-while getopts "hvHDN:" opt; do
+while getopts "hvHDN:W" opt; do
     case "$opt" in
         h) 
             help
@@ -35,6 +35,9 @@ while getopts "hvHDN:" opt; do
                 printf "If you need further help, please check ./pre-recon.sh -h"
                 exit 1
             fi
+            ;;
+        W)
+            whois_check=true
             ;;
         \?) 
             printf "Unknown option.\n"
@@ -124,4 +127,13 @@ if [[ "$headers" == true ]]; then
         tool_used="Bash built-in web utilities" 
     fi
     printf "$headers_response\n"
+fi
+
+if [[ "$whois_check" == true ]]; then 
+    if is_installed whois; then
+        whois_response=$(whois -H "$input" | grep -iE "^(Name Server|Domain Name|Postal Code|Registrant Email|Creation Date|Updated Date)|(Organization|Country|Street|City|State|Provinence)+")
+        printf "$whois_response"
+    else
+        printf "whois is not installed on this system.\n" 
+    fi
 fi
