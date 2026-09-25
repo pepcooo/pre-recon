@@ -2,22 +2,21 @@
 
 source ./utils.sh
 
-headers=false
-domain_check=false
+passive=false
+active=false
 port_scan=false
-whois_check=false
 
-while getopts "hvHDN:W" opt; do
+while getopts "hPAN:" opt; do
     case "$opt" in
         h) 
             help
             exit 0
             ;;
-        H)
-            headers=true
+        P)
+            passive=true
             ;;
-        D)
-            domain_check=true
+        A)
+            active=true
             ;;
         N) 
             port_scan=true
@@ -35,9 +34,6 @@ while getopts "hvHDN:W" opt; do
                 printf "If you need further help, please check ./pre-recon.sh -h"
                 exit 1
             fi
-            ;;
-        W)
-            whois_check=true
             ;;
         \?) 
             printf "Unknown option.\n"
@@ -59,51 +55,77 @@ fi
 
 printf "Scanning $input:\n"
 
+domain=""
+ip=""  
 
-if [[ "$domain_check" == true ]]; then
+
+if [[ "$input" =~ $IPv4_REG ]]; then
+    ip="$input"
     domain=""
-    ip=""  
-    if [[ "$input" =~ $IPv4_REG ]]; then
-        ip="$input"
-        domain=$(dig -x "$input" +short)
-    else
-        domain="$input"
-        ip=$(dig "$domain" +short)
-    fi
-
-    if [[ -z "$domain" ]]; then
-        printf "${RED}Couldn't find the domain.${RESET}\n"
-
-    elif [[ -z "$ip" ]]; then
-        printf "${RED}Couldn't find the IP address.${RESET}\n"
-
-    else
-        printf "${GREEN}Domain name:${RESET} $domain\n"
-        printf "${GREEN}IP:${RESET} $ip\n"
-    fi
-fi 
-
-if [[ "$port_scan" == true ]]; then
-
-    case "$scan_type" in
-        s)
-            nmap_scan=$(nmap -sS -D RND,RND,RND,RND,RND,RND,RND,ME,RND,RND -Pn -T2 $input)
-            ;;
-        m)
-            nmap_scan=$(nmap -sS -Pn $input)
-            ;;
-        f)  
-            nmap_scan=$(nmap -sS -Pn -F $input)
-            ;;
-        c)
-            nmap_scan=$($custom_args "$input")
-            ;;
-    esac
-
-    printf "$nmap_scan\n"
+else
+    domain="$input"
+    ip=""
 fi
 
-if [[ "$headers" == true ]]; then
+if [[ "$passive" == true ]]; then
+    printf "${BLUE}Performing passive scan...${RESET}\n"
+
+    if is_installed dig; then
+        if [[ -z "$domain" ]]; then
+            domain=$(dig -x "$ip" +short)
+            
+            if [[ -z "$domain" ]]; then
+                printf "${RED}Couldn't look up the domain.${RESET}\n"
+            fi
+
+        elif [[ -z "$ip" ]]; then
+            ip=$(dig "$domain" +short)
+            
+            if [[ -z "$ip" ]]; then
+                printf "${RED}Couldn't find the IP address.${RESET}\n"
+            fi
+
+        fi
+    fi
+
+
+    if [[ ! -z "$domain" && ! -z "$ip" ]]; then
+        printf "${GREEN}IP${RESET}: $ip\n"
+        printf "${GREEN}Domain name${RESET} $domain\n"
+    fi
+
+    
+    if is_installed whois; then
+        whois_response=$(whois -H "$input" | grep -iE "^(Name Server|Domain Name|Postal Code|Registrant Email|Creation Date|Updated Date)|(Organization|Country|Street|City|State|Provinence)+")
+        printf "$whois_response"
+    else
+        printf "whois is not installed on this system.\n" 
+    fi
+
+
+fi
+
+if [[ "$active" == true ]]; then
+    printf "${BLUE}Performing active scan...${RESET}"
+    if [[ "$port_scan" == true ]]; then
+        case "$scan_type" in
+            s)
+                nmap_scan=$(nmap -sS -D RND,RND,RND,RND,RND,RND,RND,ME,RND,RND -Pn -T2 $input)
+                ;;
+            m)
+                nmap_scan=$(nmap -sS -Pn $input)
+                ;;
+            f)  
+                nmap_scan=$(nmap -sS -Pn -F $input)
+                ;;
+            c)
+                nmap_scan=$($custom_args "$input")
+                ;;
+        esac
+
+        printf "$nmap_scan\n"
+    fi
+
     tool_used="None"
     headers_response="Unknown"
     if is_installed curl; then
@@ -127,13 +149,4 @@ if [[ "$headers" == true ]]; then
         tool_used="Bash built-in web utilities" 
     fi
     printf "$headers_response\n"
-fi
-
-if [[ "$whois_check" == true ]]; then 
-    if is_installed whois; then
-        whois_response=$(whois -H "$input" | grep -iE "^(Name Server|Domain Name|Postal Code|Registrant Email|Creation Date|Updated Date)|(Organization|Country|Street|City|State|Provinence)+")
-        printf "$whois_response"
-    else
-        printf "whois is not installed on this system.\n" 
-    fi
 fi
