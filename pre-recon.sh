@@ -70,6 +70,7 @@ fi
 if [[ "$passive" == true ]]; then
     printf "${BLUE}Performing passive scan...${RESET}\n"
 
+
     if is_installed dig; then
         if [[ -z "$domain" ]]; then
             domain=$(dig -x "$ip" +short)
@@ -88,21 +89,33 @@ if [[ "$passive" == true ]]; then
         fi
     fi
 
-
     if [[ ! -z "$domain" && ! -z "$ip" ]]; then
-        printf "${GREEN}IP${RESET}: $ip\n"
-        printf "${GREEN}Domain name${RESET} $domain\n"
+        printf "${GREEN}IP${RESET}:\n$ip\n\n\n"
+        printf "${GREEN}Domain name${RESET}:\n$domain\n\n\n"
     fi
 
     
+    
     if is_installed whois; then
         whois_response=$(whois -H "$input" | grep -iE "^(Name Server|Domain Name|Postal Code|Registrant Email|Creation Date|Updated Date)|(Organization|Country|Street|City|State|Provinence)+")
-        printf "$whois_response"
+        printf "whois ${GREEN}response${RESET}:\n$whois_response\n\n\n"
     else
-        printf "whois is not installed on this system.\n" 
+        printf "whois ${RED}is not installed on this system.\n"
+        printf "Consider installing it to get more information about the domain.\n\n\n" 
     fi
 
 
+    if is_installed curl; then
+        subdomains=$(curl -s "https://crt.sh/?q=%25.$input&output=json" | jq -r ".[].name_value" | sed "s/\*\.//" | sort -u)
+    fi
+
+    if [[ -z "$subdomains" ]]; then
+        printf "${RED}No subdomains found or ${RESET}crt.sh${RED} is down.\n"
+        printf "Check https://downforeveryoneorjustme.com/crt.sh to see if crt.sh is down.\n"
+        printf "If so, either wait until it is back again or use another tool to enumerate subdomains, like DNSDumpster (online) or sublist3r.\n\n\n"
+    else
+        printf "${GREEN}Subdomains:${RESET}\n$subdomains\n"
+    fi  
 fi
 
 if [[ "$active" == true ]]; then
