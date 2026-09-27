@@ -101,7 +101,7 @@ if [[ "$passive" == true ]]; then
         printf "whois ${GREEN}response${RESET}:\n$whois_response\n\n\n"
     else
         printf "whois ${RED}is not installed on this system.\n"
-        printf "Consider installing it to get more information about the domain.\n\n\n" 
+        printf "Consider installing it to get more information about the domain.${RESET}\n\n\n" 
     fi
 
 
@@ -112,7 +112,7 @@ if [[ "$passive" == true ]]; then
     if [[ -z "$subdomains" ]]; then
         printf "${RED}No subdomains found or ${RESET}crt.sh${RED} is down.\n"
         printf "Check https://downforeveryoneorjustme.com/crt.sh to see if crt.sh is down.\n"
-        printf "If so, either wait until it is back again or use another tool to enumerate subdomains, like DNSDumpster (online) or sublist3r.\n\n\n"
+        printf "If so, either wait until it is back again or use another tool to enumerate subdomains, like DNSDumpster (online) or sublist3r.${RESET}\n\n\n"
     else
         printf "${GREEN}Subdomains:${RESET}\n$subdomains\n"
     fi  
@@ -120,6 +120,8 @@ fi
 
 if [[ "$active" == true ]]; then
     printf "${BLUE}Performing active scan...${RESET}"
+
+
     if [[ "$port_scan" == true ]]; then
         case "$scan_type" in
             s)
@@ -136,11 +138,13 @@ if [[ "$active" == true ]]; then
                 ;;
         esac
 
-        printf "$nmap_scan\n"
+        printf "Nmap ${GREEN}scan:${RESET}$nmap_scan\n\n\n"
     fi
+
 
     tool_used="None"
     headers_response="Unknown"
+
     if is_installed curl; then
         headers_response=$(curl -I -s -L -k -m 5 http://$input)
         tool_used="cURL"
@@ -161,5 +165,7 @@ if [[ "$active" == true ]]; then
         fi
         tool_used="Bash built-in web utilities" 
     fi
-    printf "$headers_response\n"
+  
+  
+    printf "${GREEN}Headers response:\n$headers_response\n\n\n"
 fi
