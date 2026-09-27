@@ -14,7 +14,7 @@ function help() {
     printf "Usage:\n"
     printf "    ./pre-recon.sh [options] <IP address/domain name>\n"
     printf "Available options:\n"
-    printf "    -A - enables active reconnaissance (site response headers, port scan) \n"
+    printf "    -A - enables active reconnaissance (site response headers, port scan, ) \n"
     printf "    -P - enables passive reconnaissance (DNS/reverse DNS lookup, whois info)\n"
     printf "    -N - enables a port scan, checking for open ports. MUST BE USED WITH -A OPTION, OTHERWISE A SCAN WILL NOT OCCUR.\n"
     printf "    Available scan modes are:\n"

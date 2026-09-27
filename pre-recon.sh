@@ -48,7 +48,7 @@ input=$1
 
 
 if [[ -z "$input" ]]; then
-    printf "${RED}Empty input.${RESET}"
+    printf "${RED}Empty input.${RESET}\n"
     exit 1 
 fi
 
