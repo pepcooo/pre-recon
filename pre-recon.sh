@@ -5,6 +5,7 @@ source ./utils.sh
 passive=false
 active=false
 port_scan=false
+scan_type=1
 
 while getopts "hPAN:" opt; do
     case "$opt" in
@@ -21,18 +22,23 @@ while getopts "hPAN:" opt; do
         N) 
             port_scan=true
             scan_type="$OPTARG"
+
+            if [[ ! "$scan_type" =~ ^[dc]$ ]]; then
+                printf "Unknown nmap scan option.\n"
+                exit 1
+            fi    
+
             if [[ "$scan_type" == "c" ]]; then
+                scan="custom"
                 custom_args="${!OPTIND}"
                 if [[ -z "$custom_args" || "$custom_args" != nmap* ]]; then
                     printf "Error in parsing custom nmap query."
                     exit 1
                 fi
                 OPTIND=$((OPTIND+1))
-            elif [[ ! "$scan_type" =~ ^(s|m|f|c)$ ]]; then
-                printf "${YELLOW}Unknown port scan type.\n" 
-                printf "Viable options are: ${RESET}s, m, f, c (custom).\n"
-                printf "If you need further help, please check ./pre-recon.sh -h"
-                exit 1
+
+            else
+                scan="default"
             fi
             ;;
         \?) 
@@ -119,28 +125,7 @@ if [[ "$passive" == true ]]; then
 fi
 
 if [[ "$active" == true ]]; then
-    printf "${BLUE}Performing active scan...${RESET}"
-
-
-    if [[ "$port_scan" == true ]]; then
-        case "$scan_type" in
-            s)
-                nmap_scan=$(nmap -sS -D RND,RND,RND,RND,RND,RND,RND,ME,RND,RND -Pn -T2 $input)
-                ;;
-            m)
-                nmap_scan=$(nmap -sS -Pn $input)
-                ;;
-            f)  
-                nmap_scan=$(nmap -sS -Pn -F $input)
-                ;;
-            c)
-                nmap_scan=$($custom_args "$input")
-                ;;
-        esac
-
-        printf "Nmap ${GREEN}scan:${RESET}$nmap_scan\n\n\n"
-    fi
-
+    printf "${BLUE}Performing active scan...${RESET}\n"
 
     tool_used="None"
     headers_response="Unknown"
@@ -167,5 +152,16 @@ if [[ "$active" == true ]]; then
     fi
   
   
-    printf "${GREEN}Headers response:\n$headers_response\n\n\n"
+    printf "${GREEN}Headers response${RESET}:\n$headers_response\n\n\n"
+fi
+
+if [[ "$port_scan" == true ]]; then
+    nmap_scan=""
+    if [[ "$scan" == "default" ]]; then
+        nmap_scan=$(nmap -sX -D RND,RND,RND,RND,ME -T2 -Pn --top-ports 200 "$input")
+    elif [[ "$scan" == "custom" ]]; then
+        nmap_scan=$($custom_args $input)
+    fi
+
+    printf "Nmap scan:\n$nmap_scan"
 fi
