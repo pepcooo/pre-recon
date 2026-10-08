@@ -153,9 +153,27 @@ if [[ "$active" == true ]]; then
   
   
     printf "${GREEN}Headers response${RESET}:\n$headers_response\n\n\n"
+
+
+    if is_installed traceroute; then
+        traceroute_response=$(traceroute $input)
+        
+        if [[ -z traceroute_response ]]; then
+            printf "traceroute ${RED}failed${RESET}.\n"
+        
+        else
+            printf "traceroute ${GREEN}response ${RESET}(* * * means that the router has dropped the packet):\n"
+            printf "$traceroute_response\n"
+        fi
+
+    else
+        printf "traceroute ${RED}is not installed on this system.${RESET}\n" 
+    fi
+    
 fi
 
 if [[ "$port_scan" == true ]]; then
+    printf "${BLUE}Performing nmap scan...${RESET}\n"
     nmap_scan=""
     if [[ "$scan" == "default" ]]; then
         nmap_scan=$(nmap -sX -D RND,RND,RND,RND,ME -T2 -Pn --top-ports 200 "$input")
